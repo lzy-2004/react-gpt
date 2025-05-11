@@ -1,6 +1,7 @@
-import React from "react";
-export default function Home() {
+"use client";
+import Home from "./components/home";
+export default function App() {
   return (
-    <p>hello react gpt!</p>
+    <Home />
   );
 }
