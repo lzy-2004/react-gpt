@@ -1,5 +1,6 @@
 @mixin container {
-    background-color: var(--white);
+    background-color: transparent;
+    // background-color: var(--white);
     border: var(--border-in-light);
     border-radius: 20px;
     box-shadow: var(--shadow);
@@ -40,6 +41,7 @@
 .sidebar {
     top: 0;
     width: var(--sidebar-width);
+    border-radius: 20px 0 0 20px;
     box-sizing: border-box;
     padding: 20px;
     background-color: var(--second);

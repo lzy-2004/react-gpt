@@ -7,6 +7,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    padding: 0 20px;
 
     .mask-header {
         display: flex;
@@ -29,6 +30,7 @@
             border-radius: 14px;
             background-color: var(--white);
             transform: scale(1);
+            margin: 0 5px;
 
             &:first-child {
                 transform: rotate(-15deg) translateY(5px);
@@ -45,10 +47,17 @@
         font-weight: bolder;
         margin-bottom: 1vh;
         animation: slide-in ease 0.35s;
+        background: linear-gradient(to right, var(--primary), #8e44ad);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .sub-title {
         animation: slide-in ease 0.4s;
+        margin-bottom: 30px;
+        color: var(--secondary);
+        font-size: 16px;
     }
 
     .actions {
@@ -66,40 +75,105 @@
 
     .mask-container {
         display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
         width: 100%;
-        height: 100%;
+        // max-width: 1000px;
+        max-height: 60vh;
         overflow: auto;
-        align-items: center;
-        justify-content: center;
-        padding-top: 20px;
+        padding: 20px 60px 20px 20px;
+        animation: slide-in ease 0.5s;
+        box-sizing: border-box;
+        
+        /* 美化滚动条 */
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--secondary);
+            border-radius: 10px;
+        }
 
         .mask {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            padding: 10px 14px;
+            justify-content: center;
+            padding: 20px;
             border: var(--border-in-light);
             box-shadow: var(--card-shadow);
             background-color: var(--white);
-            border-radius: 10px;
-            margin-top: 10px;
-            margin-right: 10px;
-            max-width: 8em;
+            border-radius: 16px;
+            height: 100px;
             transform: scale(1);
             cursor: pointer;
             transition: all ease 0.3s;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            
+            &::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(to right, var(--primary), #8e44ad);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
 
             &:hover {
-                transform: translateY(-5px) scale(1.1);
-                z-index: 999;
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
                 border-color: var(--primary);
+                
+                &::before {
+                    opacity: 1;
+                }
             }
 
             .mask-name {
-                margin-left: 10px;
-                font-size: 14px;
+                margin-top: 15px;
+                font-size: 16px;
+                font-weight: 500;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
-
     }
+}
 
+/* 响应式布局 */
+@media (max-width: 600px) {
+    .new-chat {
+        .mask-container {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            
+            .mask {
+                height: 140px;
+                padding: 15px;
+                
+                .mask-name {
+                    font-size: 14px;
+                }
+            }
+        }
+        
+        .title {
+            font-size: 28px;
+        }
+        
+        .sub-title {
+            font-size: 14px;
+        }
+    }
 }

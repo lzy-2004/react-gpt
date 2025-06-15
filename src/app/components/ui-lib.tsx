@@ -10,7 +10,7 @@ import { createRoot } from "react-dom/client";
 import { HTMLProps, useEffect, useState } from "react";
 import React from "react";
 import Locale from "../locales";
-
+import Image from "next/image";
 export function Popover(props: {
     children: JSX.Element;
     content: JSX.Element;

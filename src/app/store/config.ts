@@ -24,7 +24,11 @@ export enum Theme {
     Dark = "dark",
     Light = "light",
 }
-
+interface AppConfigActions {
+    updateTheme: (theme: Theme) => void;
+    setConfig: (config: Partial<ChatConfig>) => void;
+    // 其他 action 方法...
+}
 export const DEFAULT_CONFIG = {
     lastUpdate: Date.now(), // timestamp, to merge state
 
@@ -38,7 +42,6 @@ export const DEFAULT_CONFIG = {
     sidebarWidth: DEFAULT_SIDEBAR_WIDTH,
 
     disablePromptHint: false,
-
     dontShowMaskSplashScreen: false, // dont show splash screen when create chat
     hideBuiltinMasks: false, // dont add builtin masks
 
@@ -61,77 +64,76 @@ export const DEFAULT_CONFIG = {
 };
 
 export type ChatConfig = typeof DEFAULT_CONFIG;
-
 export type ModelConfig = ChatConfig["modelConfig"];
 
-export function limitNumber(
-    x: number,
-    min: number,
-    max: number,
-    defaultValue: number,
-) {
-    if (isNaN(x)) {
-        return defaultValue;
-    }
-
+export function limitNumber(x: number, min: number, max: number, defaultValue: number): number {
+    if (isNaN(x)) return defaultValue;
     return Math.min(max, Math.max(min, x));
 }
 
 export const ModalConfigValidator = {
-    model(x: string) {
+    model(x: string): ModelType {
         return x as ModelType;
     },
-    max_tokens(x: number) {
+    max_tokens(x: number): number {
         return limitNumber(x, 0, 512000, 1024);
     },
-    presence_penalty(x: number) {
+    presence_penalty(x: number): number {
         return limitNumber(x, -2, 2, 0);
     },
-    frequency_penalty(x: number) {
+    frequency_penalty(x: number): number {
         return limitNumber(x, -2, 2, 0);
     },
-    temperature(x: number) {
+    temperature(x: number): number {
         return limitNumber(x, 0, 2, 1);
     },
-    top_p(x: number) {
+    top_p(x: number): number {
         return limitNumber(x, 0, 1, 1);
     },
 };
 
-export const useAppConfig = create<typeof DEFAULT_CONFIG>()(
-    persist((set, get) => ({
-        ...DEFAULT_CONFIG,
-        reset() {
-            set(() => ({ ...DEFAULT_CONFIG }));
-        },
+export const useAppConfig = create<ChatConfig & AppConfigActions>()(
+    persist(
+        (set, get) => ({
+            ...DEFAULT_CONFIG,
 
-        mergeModels(newModels: LLMModel[]) {
-            if (!newModels || newModels.length === 0) {
-                return;
-            }
+            // 更新单个字段的方法
+            // 在useAppConfig的定义中，替换原有的updateTheme实现
+            updateTheme(theme: Theme) {
+                set({ theme });
+            },
+            setConfig(config: Partial<ChatConfig>) { /* 原有实现 */ },
+            updateSubmitKey(key: SubmitKey) {
+                set({ submitKey: key });
+            },
+            updateFontSize(size: number) {
+                set({ fontSize: size });
+            },
+            updateModelConfig(config: Partial<ModelConfig>) {
+                set({
+                    modelConfig: {
+                        ...get().modelConfig,
+                        ...config,
+                    },
+                });
+            },
 
-            const oldModels = get().models;
-            const modelMap: Record<string, LLMModel> = {};
+            reset() {
+                set(() => ({ ...DEFAULT_CONFIG }));
+            },
 
-            for (const model of oldModels) {
-                model.available = false;
-                modelMap[model.name] = model;
-            }
-
-            for (const model of newModels) {
-                model.available = true;
-                modelMap[model.name] = model;
-            }
-
-            set(() => ({
-                models: Object.values(modelMap),
-            }));
-        },
-
-        allModels() { },
-    }),
+            mergeModels(newModels: LLMModel[]) {
+                if (!newModels || newModels.length === 0) return;
+                const oldModels = get().models;
+                const modelMap: Record<string, LLMModel> = {};
+                [...oldModels, ...newModels].forEach(model => {
+                    modelMap[model.name] = { ...model };
+                });
+                set({ models: Object.values(modelMap) });
+            },
+        }),
         {
             name: StoreKey.Config,
         },
-    )
+    ),
 );
